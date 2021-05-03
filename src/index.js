@@ -2,11 +2,15 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
+import { GenerateContext, GenerateContextProvider } from './components/GenerateContext';
 import reportWebVitals from './reportWebVitals';
+import 'bootstrap/dist/css/bootstrap.css';
 
 ReactDOM.render(
   <React.StrictMode>
-    <App />
+    <GenerateContextProvider>
+      <App/>
+    </GenerateContextProvider>
   </React.StrictMode>,
   document.getElementById('root')
 );
