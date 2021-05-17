@@ -37,8 +37,10 @@ function App() {
          const mp3 = new Blob([response.data], { type: 'audio/wav' })
          const url = window.URL.createObjectURL(mp3)
          const audio = new Audio(url)
-         audio.load()
-         await audio.play()
+         // audio.load()
+         // DEBUG
+         window.open(url, '_blank')
+         // await audio.play()
        } catch (e) {
          console.log('play audio error: ', e)
        }

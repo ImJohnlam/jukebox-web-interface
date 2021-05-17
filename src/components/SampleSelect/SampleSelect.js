@@ -50,11 +50,6 @@ const UploadObj = props => {
 }
 
 export default function SampleSelect(props) {
-   let uploadInput;
-
-   let temp = e => {}
-
-
    return (
       <section className='container'>
          <h2>Select a sample</h2>
