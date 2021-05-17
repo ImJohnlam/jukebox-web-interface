@@ -102,7 +102,7 @@ def apply_low_pass_filter(d, target, filename):
         wav_file.setparams((1, ampWidth, sampleRate, nFrames, spf.getcomptype(), spf.getcompname()))
         wav_file.writeframes(filtered.tobytes('C'))
         wav_file.close()
-        return wav_file
+        return outname
 
 
 @app.route('/upload', methods=['POST'])
@@ -126,8 +126,9 @@ def fileUpload():
     path = os.path.join(UPLOAD_FOLDER,'test_docs', filename)
     logger.info('about to return: ' + destination)
 
-    # return send_file(destination, as_attachment=True)
-    return send_file(apply_low_pass_filter(destination), as_attachment=True)
+    #return send_file(quieter(destination), as_attachment=True)
+    return send_file(apply_low_pass_filter(destination, target, filename),
+                     as_attachment=True)
 
 
 if __name__ == "__main__":
