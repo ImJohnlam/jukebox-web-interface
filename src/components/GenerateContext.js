@@ -3,7 +3,7 @@ import React, { useState, createContext } from 'react'
 const GenerateContext = createContext();
 const GenerateContextProvider = props => {
    const [sample, setSample] = useState("");
-   const [filters, setFilters] = useState([]);
+   const [filters, setFilters] = useState({});
 
    const getGenState = type => {
       switch (type) {

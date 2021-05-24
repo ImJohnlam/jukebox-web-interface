@@ -1,7 +1,6 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { Button } from 'react-bootstrap';
 import { GenerateContext } from '../GenerateContext';
-const axios = require('axios');
 
 const SampleObj = props => {
    const [getGenState, setGenState] = useContext(GenerateContext);

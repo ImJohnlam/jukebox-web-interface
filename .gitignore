@@ -13,6 +13,7 @@ env
 /build
 
 # misc
+/api/uploads
 .DS_Store
 .env.local
 .env.development.local
