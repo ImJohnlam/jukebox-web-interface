@@ -54,6 +54,23 @@ def fileUpload():
                      as_attachment=True)
 
 
+@app.route('/filters')
+def get_filters():
+    return {'filters': [
+        {
+            'name': 'Low Pass Filter',
+            'params': [
+                {
+                    'type': 'numeric',
+                    'name': 'Cutoff Frequency',
+                    'value': 8000.,
+                    'upper_bound': 22090.,
+                    'lower_bound': 8.
+                }
+            ]
+        }
+    ]}
+    
 if __name__ == "__main__":
     app.secret_key = os.urandom(24)
     app.run(debug=True, host="0.0.0.0", use_reloader=False)
