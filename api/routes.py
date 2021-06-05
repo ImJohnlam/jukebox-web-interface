@@ -6,7 +6,7 @@ import logging
 import json
 import time
 import matplotlib.pyplot as plt
-from filters import LowPassFilter, QuieterFilter
+from filters import LowPassFilter, QuieterFilter, EllipticFilter
 from pydub import AudioSegment
 
 from scipy import signal
@@ -51,10 +51,12 @@ def fileUpload():
     path = os.path.join(UPLOAD_FOLDER, 'test_docs', filename)
     logger.info('about to return: ' + destination)
     filter = LowPassFilter(destination, target, filename)
+    ell_filter = EllipticFilter(destination, target, file)
     # filter = QuieterFilter(destination)
     output = filter.apply()
+    ell_output = ell_filter.apply()
     #return send_file(quieter(destination), as_attachment=True)
-    return send_file(output,
+    return send_file(ell_output,
                      as_attachment=True)
 
 
