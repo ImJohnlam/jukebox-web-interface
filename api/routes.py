@@ -1,11 +1,17 @@
+import io
+import random
+
 import os
-from flask import Flask, flash, request, redirect, url_for, session, send_file, jsonify
+from flask import Flask, flash, request, redirect, url_for, session, send_file, jsonify, Response
 from werkzeug.utils import secure_filename
 from flask_cors import CORS, cross_origin
 import logging
 import json
 import time
 import matplotlib.pyplot as plt
+from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
+from matplotlib.figure import Figure
+
 from filters import LowPassFilter, QuieterFilter, EllipticFilter
 from pydub import AudioSegment
 
@@ -94,23 +100,23 @@ def get_sample(src):
     logger.info(f'get sample, path={path}')
     return send_file(path, as_attachment=True)
 
-@app.route('/imagetest', methods=['POST'])
-def get_img():
-    target = os.path.join(UPLOAD_FOLDER, 'spectrograms')
-    if not os.path.isdir(target):
-        os.mkdir(target)
+# @app.route('/imagetest', methods=['POST'])
+# def get_img():
+#     target = os.path.join(UPLOAD_FOLDER, 'spectrograms')
+#     if not os.path.isdir(target):
+#         os.mkdir(target)
 
-    logger.info(f'imagetest target={target}')
-    logger.info(f'{request.files}')
-    file = request.files['file']
-    filename = secure_filename(file.filename)
-    logger.info(f'filename={filename}')
+#     logger.info(f'imagetest target={target}')
+#     logger.info(f'{request.files}')
+#     file = request.files['file']
+#     filename = secure_filename(file.filename)
+#     logger.info(f'filename={filename}')
 
-    destination = os.path.join(target, filename)
-    file.save(destination)
+#     destination = os.path.join(target, filename)
+#     file.save(destination)
 
 
-    return send_file('cat.jpg', as_attachment=True)
+#     return send_file('cat.jpg', as_attachment=True)
 
 @app.route('/get_image', methods=['POST'])
 def get_image():
@@ -118,7 +124,7 @@ def get_image():
     if not os.path.isdir(target):
         os.mkdir(target)
 
-    logger.info(f'imagetest target={target}')
+    logger.info(f'get_image target={target}')
     logger.info(f'{request.files}')
     file = request.files['file']
     filename = secure_filename(file.filename)
@@ -127,6 +133,18 @@ def get_image():
     destination = os.path.join(target, filename)
     file.save(destination)
 
+    """
+    fig = Figure()
+    axis = fig.add_subplot(1, 1, 1)
+    xs = range(100)
+    ys = [random.randint(1, 50) for x in xs]
+    axis.plot(xs, ys)
+    
+    output = io.BytesIO()
+    FigureCanvas(fig).print_png(output)
+    return Response(output.getvalue(), mimetype='image/png')
+    
+    """
     sample_rate, samples = wavfile.read(destination)
     frequencies, times, spectrogram = signal.spectrogram(samples, sample_rate)
 
@@ -138,6 +156,7 @@ def get_image():
     # plt.show()
     #saves spectogram as image
     plt.savefig(img_filename)
+    plt.clf()
 
     if request.args.get('type') == '1':
        filename = 'ok.gif'
