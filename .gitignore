@@ -14,6 +14,7 @@ env
 
 # misc
 /api/uploads
+/api/samples
 .DS_Store
 .env.local
 .env.development.local

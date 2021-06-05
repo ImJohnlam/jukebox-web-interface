@@ -9,12 +9,16 @@ import matplotlib.pyplot as plt
 from filters import LowPassFilter, QuieterFilter
 from pydub import AudioSegment
 
+from scipy import signal
+from scipy.io import wavfile
+
 
 logging.basicConfig(level=logging.INFO)
 
 logger = logging.getLogger('HELLO WORLD')
 
 UPLOAD_FOLDER = 'uploads'
+SAMPLES_FOLDER = 'samples'
 ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
 
 app = Flask(__name__)
@@ -70,7 +74,75 @@ def get_filters():
             ]
         }
     ]}
-    
+
+@app.route('/sample_info')
+def get_sample_info():
+    logger.info("hit sample info")
+    return {'samples': [
+        {
+            'name': 'Example Song',
+            'artist': 'Example Artist',
+            'src': 'example.wav'
+        }
+    ]}
+
+@app.route('/sample/<src>')
+def get_sample(src):
+    path = os.path.join(SAMPLES_FOLDER, src)
+    logger.info(f'get sample, path={path}')
+    return send_file(path, as_attachment=True)
+
+@app.route('/imagetest', methods=['POST'])
+def get_img():
+    target = os.path.join(UPLOAD_FOLDER, 'spectrograms')
+    if not os.path.isdir(target):
+        os.mkdir(target)
+
+    logger.info(f'imagetest target={target}')
+    logger.info(f'{request.files}')
+    file = request.files['file']
+    filename = secure_filename(file.filename)
+    logger.info(f'filename={filename}')
+
+    destination = os.path.join(target, filename)
+    file.save(destination)
+
+
+    return send_file('cat.jpg', as_attachment=True)
+
+@app.route('/get_image', methods=['POST'])
+def get_image():
+    target = os.path.join(UPLOAD_FOLDER, 'spectrograms')
+    if not os.path.isdir(target):
+        os.mkdir(target)
+
+    logger.info(f'imagetest target={target}')
+    logger.info(f'{request.files}')
+    file = request.files['file']
+    filename = secure_filename(file.filename)
+    logger.info(f'filename={filename}')
+
+    destination = os.path.join(target, filename)
+    file.save(destination)
+
+    sample_rate, samples = wavfile.read(destination)
+    frequencies, times, spectrogram = signal.spectrogram(samples, sample_rate)
+
+    img_filename = os.path.join(target, 'spectrogram.png')
+    plt.pcolormesh(times, frequencies, spectrogram)
+    plt.imshow(spectrogram)
+    plt.ylabel('Frequency [Hz]')
+    plt.xlabel('Time [sec]')
+    # plt.show()
+    #saves spectogram as image
+    plt.savefig(img_filename)
+
+    if request.args.get('type') == '1':
+       filename = 'ok.gif'
+    else:
+       filename = 'error.gif'
+    return send_file(img_filename, mimetype='image/gif')
+
 if __name__ == "__main__":
     app.secret_key = os.urandom(24)
     app.run(debug=True, host="0.0.0.0", use_reloader=False)

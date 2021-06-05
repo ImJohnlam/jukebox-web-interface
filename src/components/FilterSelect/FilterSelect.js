@@ -61,8 +61,9 @@ export default function FilterSelect(props) {
       <section className='container'>
          <h2>Apply filters</h2>
          <Button onClick={e => console.log(JSON.stringify(getGenState('FILTERS'), null, 2))}>print selected filter</Button>
-         {filters.map(filter => <FilterObj name={filter.name}
-                                           params={filter.params}/>)}
+         {filters.length ? filters.map(filter => <FilterObj name={filter.name}
+                                           params={filter.params}/>)
+         : ""}
       </section>
    );
 }
