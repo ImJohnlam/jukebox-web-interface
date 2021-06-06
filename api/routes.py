@@ -58,9 +58,10 @@ def fileUpload():
     logger.info('about to return: ' + destination)
     filter = LowPassFilter(destination, target, filename)
     logger.info('before apply')
-    # ell_filter = EllipticFilter(destination, target, file)
+    ell_filter = EllipticFilter(destination, target, filename)
     # filter = QuieterFilter(destination)
     output = filter.apply()
+    output_ell = ell_filter.apply()
     logger.info('upload filter apply pass')
     #return send_file(quieter(destination), as_attachment=True)
     return send_file(output,
@@ -76,13 +77,34 @@ def get_filters():
                 {
                     'type': 'numeric',
                     'name': 'Cutoff Frequency',
-                    'value': 8000.,
+                    'value': 4000.,
                     'upper_bound': 22090.,
                     'lower_bound': 8.
+                }
+            ],
+            'name': 'Elliptic Filter',
+            'params': [
+                {
+                    'type': 'numeric',
+                    'name': 'Cutoff Frequency',
+                    'value': 4000.,
+                    'upper_bound': 22090.,
+                    'lower_bound': 8.
+                },
+                {
+                    'type': 'numeric',
+                    'name': 'Max Ripple',
+                    'value': 5.
+                },
+                {
+                    'type': 'numeric',
+                    'name': 'Min Attenuation',
+                    'value': 40.
                 }
             ]
         }
     ]}
+
 
 @app.route('/sample_info')
 def get_sample_info():
