@@ -74,10 +74,10 @@ class LowPassFilter(Filter):
             nFrames = spf.getnframes()
 
             # Extract Raw Audio from multi-channel Wav File
-            signal = spf.readframes(nFrames * nChannels)
+            sig = spf.readframes(nFrames * nChannels)
             spf.close()
             channels = self.interpret_wav(
-                signal, nFrames, nChannels, ampWidth, True)
+                sig, nFrames, nChannels, ampWidth, True)
 
             # get window size
             # from http://dsp.stackexchange.com/questions/9966/what-is-the-cut-off-frequency-of-a-moving-average-filter
@@ -101,6 +101,7 @@ class LowPassFilter(Filter):
         cumulative_sum = np.cumsum(np.insert(x, 0, 0))
         return (cumulative_sum[windowSize:] - cumulative_sum[:-windowSize]) / windowSize
 
+
 class EllipticFilter(Filter):
     def __init__(self, wav_file, target, filename):
         self.wav_file = wav_file
@@ -117,18 +118,19 @@ class EllipticFilter(Filter):
             nFrames = spf.getnframes()
 
             # Extract Raw Audio from multi-channel Wav File
-            signal = spf.readframes(nFrames * nChannels)
+            sig = spf.readframes(nFrames * nChannels)
             spf.close()
             channels = self.interpret_wav(
-                signal, nFrames, nChannels, ampWidth, True)
+                sig, nFrames, nChannels, ampWidth, True)
 
             # TODO: Take these as params from user
             cutoff_frequency = 4000.0
             max_ripple = 5
             min_attenuation = 40
 
-            sos = signal.ellip(4, max_ripple, min_attenuation, cutoff_frequency, output='sos')
-            filtered = signal.sosfilt(sos, signal).astype(channels.dtype)
+            sos = signal.ellip(4, max_ripple, min_attenuation, cutoff_frequency,
+                               fs=sampleRate, output='sos')
+            filtered = signal.sosfilt(sos, channels).astype(channels.dtype)
 
             wav_file = wave.open(outname, "w")
             wav_file.setparams((1, ampWidth, sampleRate, nFrames,
