@@ -22,7 +22,7 @@ const SampleObj = props => {
    }, []);
 
    const isSelected = () => getGenState('SAMPLE') == name;
-   const select = () => setGenState('SAMPLE', name);
+   const select = () => setGenState('SAMPLE', new File([blob], info.src, {type:'audio/wav'}));
 
    return (
       <div>
@@ -73,7 +73,7 @@ export default function SampleSelect(props) {
    return (
       <section className='container'>
          <h2>Select a sample</h2>
-         {sampleInfo.length ?
+         {sampleInfo && sampleInfo.length ?
          sampleInfo.map(info => <SampleObj info={info}/>)
          : ""
          }

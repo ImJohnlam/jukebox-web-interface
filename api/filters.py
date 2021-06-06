@@ -34,7 +34,15 @@ class Filter(ABC):
             # channels are not interleaved. All samples from channel M occur before all samples from channel M-1
             channels.shape = (n_channels, n_frames)
         return channels
+    
+    @staticmethod
+    def get_filter_class(name):
+        filter_dict = {
+            'Low Pass Filter': LowPassFilter,
+            'Elliptic Filter': EllipticFilter
+        }
 
+        return filter_dict[name] if name in filter_dict else None
 
 class QuieterFilter(Filter):
     def __init__(self, destination) -> None:
@@ -58,13 +66,14 @@ class QuieterFilter(Filter):
 
 
 class LowPassFilter(Filter):
-    def __init__(self, wav_file, target, filename):
+    def __init__(self, wav_file, target, filename, params):
         self.wav_file = wav_file
         self.target = target
         self.filename = filename
+        self.params = params
 
     def apply(self):
-        cutOffFrequency = 4000.0
+        cutOffFrequency = float(self.params['Cutoff Frequency'])
         outname = os.path.join(os.path.join(
             self.target, "filtered_" + self.filename))
         with contextlib.closing(wave.open(self.wav_file, 'rb')) as spf:
@@ -103,10 +112,11 @@ class LowPassFilter(Filter):
 
 
 class EllipticFilter(Filter):
-    def __init__(self, wav_file, target, filename):
+    def __init__(self, wav_file, target, filename, params):
         self.wav_file = wav_file
         self.target = target
         self.filename = filename
+        self.params = params
 
     def apply(self):
         outname = os.path.join(os.path.join(
@@ -124,9 +134,9 @@ class EllipticFilter(Filter):
                 sig, nFrames, nChannels, ampWidth, True)
 
             # TODO: Take these as params from user
-            cutoff_frequency = 4000.0
-            max_ripple = 5
-            min_attenuation = 40
+            cutoff_frequency = float(self.params['Cutoff Frequency'])
+            max_ripple = float(self.params['Max Ripple'])
+            min_attenuation = float(self.params['Min Attenuation'])
 
             sos = signal.ellip(4, max_ripple, min_attenuation, cutoff_frequency,
                                fs=sampleRate, output='sos')

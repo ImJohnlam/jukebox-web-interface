@@ -10,19 +10,23 @@ const FilterObj = (props) => {
    }, {});
 
    const [paramState, setParamState] = useState(initialParamState);
-   const [selectState, setSelectState] = useState(false);
+   // const [selectState, setSelectState] = useState(false);
    const [getGenState, setGenState] = useContext(GenerateContext);
    
    const handleChange = ev => setParamState({...paramState, [ev.target.name]: ev.target.value})
 
    const select = () => {
       setGenState('FILTERS', {name: props.name, params:{...paramState}});
-      setSelectState(true);
+      // setSelectState(true);
    }
+
+   const isSelected = () => {
+      return getGenState('FILTERS')['name'] == props.name
+   }   
 
    const cancel = () =>  {
       setGenState('FILTERS', {});
-      setSelectState(false);
+      // setSelectState(false);
    }
 
    return (
@@ -35,12 +39,12 @@ const FilterObj = (props) => {
                       type="range" min={param.lower_bound}
                       max={param.upper_bound}
                       value={paramState[param.name]}
-                      disabled={selectState}
+                      disabled={isSelected()}
                       onChange={handleChange}/>
                {paramState[param.name]}
             </div>
          )}
-         {selectState ?
+         {isSelected() ?
          <Button onClick={cancel}>Cancel</Button>
          :
          <Button onClick={select}>Apply</Button>
@@ -61,7 +65,7 @@ export default function FilterSelect(props) {
       <section className='container'>
          <h2>Apply filters</h2>
          <Button onClick={e => console.log(JSON.stringify(getGenState('FILTERS'), null, 2))}>print selected filter</Button>
-         {filters.length ? filters.map(filter => <FilterObj name={filter.name}
+         {filters && filters.length ? filters.map(filter => <FilterObj name={filter.name}
                                            params={filter.params}/>)
          : ""}
       </section>

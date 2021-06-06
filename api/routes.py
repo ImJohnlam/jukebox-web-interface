@@ -12,7 +12,7 @@ import matplotlib.pyplot as plt
 from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 from matplotlib.figure import Figure
 
-from filters import LowPassFilter, QuieterFilter, EllipticFilter
+from filters import Filter
 from pydub import AudioSegment
 
 from scipy import signal
@@ -45,9 +45,9 @@ def fileUpload():
     logger.info("welcome to upload`")
 
     file = request.files['file']
-    filters = json.loads(request.form['filters'])
+    filter_options = json.loads(request.form['filters'])
     logger.info(f'files ({len(request.files)}) {request.files}')
-    logger.info(f'filters {type(filters)} {filters}')
+    logger.info(f'filters {type(filter_options)} {filter_options}')
 
     filename = secure_filename(file.filename)
     destination = os.path.join(target, filename)
@@ -56,14 +56,16 @@ def fileUpload():
     response = "Whatever you wish to return"
     path = os.path.join(UPLOAD_FOLDER, 'test_docs', filename)
     logger.info('about to return: ' + destination)
-    filter = LowPassFilter(destination, target, filename)
+    
+    
     logger.info('before apply')
-    ell_filter = EllipticFilter(destination, target, filename)
-    # filter = QuieterFilter(destination)
-    output = filter.apply()
-    output_ell = ell_filter.apply()
-    logger.info('upload filter apply pass')
-    #return send_file(quieter(destination), as_attachment=True)
+    if filter_options:
+        filter_class = Filter.get_filter_class(filter_options['name'])
+        filter = filter_class(destination, target, filename, filter_options['params'])
+        output = filter.apply()
+        logger.info(filter_options['params'])
+    else:
+        output = destination
     return send_file(output,
                      as_attachment=True)
 
@@ -81,7 +83,9 @@ def get_filters():
                     'upper_bound': 22090.,
                     'lower_bound': 8.
                 }
-            ],
+            ]
+        },
+        {
             'name': 'Elliptic Filter',
             'params': [
                 {
