@@ -57,12 +57,13 @@ def fileUpload():
     path = os.path.join(UPLOAD_FOLDER, 'test_docs', filename)
     logger.info('about to return: ' + destination)
     filter = LowPassFilter(destination, target, filename)
-    ell_filter = EllipticFilter(destination, target, file)
+    logger.info('before apply')
+    # ell_filter = EllipticFilter(destination, target, file)
     # filter = QuieterFilter(destination)
     output = filter.apply()
-    ell_output = ell_filter.apply()
+    logger.info('upload filter apply pass')
     #return send_file(quieter(destination), as_attachment=True)
-    return send_file(ell_output,
+    return send_file(output,
                      as_attachment=True)
 
 
@@ -145,10 +146,13 @@ def get_image():
     return Response(output.getvalue(), mimetype='image/png')
     
     """
+
+    """
     sample_rate, samples = wavfile.read(destination)
     frequencies, times, spectrogram = signal.spectrogram(samples, sample_rate)
 
     img_filename = os.path.join(target, 'spectrogram.png')
+    # plt.figure()
     plt.pcolormesh(times, frequencies, spectrogram)
     plt.imshow(spectrogram)
     plt.ylabel('Frequency [Hz]')
@@ -156,7 +160,18 @@ def get_image():
     # plt.show()
     #saves spectogram as image
     plt.savefig(img_filename)
-    plt.clf()
+    plt.close()
+    """
+    samplingFrequency, signalData = wavfile.read(destination)
+
+    img_filename = os.path.join(target, 'spectrogram.png')
+    plt.title('Spectrogram')    
+    Pxx, freqs, bins, im = plt.specgram(signalData,Fs=samplingFrequency,NFFT=512)
+    plt.xlabel('Time')
+    plt.ylabel('Frequency')
+    plt.xlim(left=0,right=17)
+    plt.savefig(img_filename)
+    plt.close()
 
     if request.args.get('type') == '1':
        filename = 'ok.gif'

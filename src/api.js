@@ -54,10 +54,10 @@ export const uploadFile = async (file, filters) => {
          data: data,
          responseType: 'blob'
       });
-      const mp3 = new Blob([response.data], { type: 'audio/wav' })
-      const url = window.URL.createObjectURL(mp3)
+      const blob = new Blob([response.data], { type: 'audio/wav' })
+      // const url = window.URL.createObjectURL(mp3)
 
-      return url;
+      return blob;
     } catch (e) {
       console.log('play audio error: ', e)
     }

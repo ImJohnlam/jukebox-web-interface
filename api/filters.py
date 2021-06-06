@@ -101,7 +101,7 @@ class LowPassFilter(Filter):
         cumulative_sum = np.cumsum(np.insert(x, 0, 0))
         return (cumulative_sum[windowSize:] - cumulative_sum[:-windowSize]) / windowSize
 
-
+"""
 class LowPassFilter(Filter):
     def __init__(self, wav_file, target, filename):
         self.wav_file = wav_file
@@ -140,7 +140,7 @@ class LowPassFilter(Filter):
             wav_file.writeframes(filtered.tobytes('C'))
             wav_file.close()
             return outname
-
+"""
 
 class EllipticFilter(Filter):
     def __init__(self, wav_file, target, filename):
