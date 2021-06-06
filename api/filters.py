@@ -101,47 +101,6 @@ class LowPassFilter(Filter):
         cumulative_sum = np.cumsum(np.insert(x, 0, 0))
         return (cumulative_sum[windowSize:] - cumulative_sum[:-windowSize]) / windowSize
 
-"""
-class LowPassFilter(Filter):
-    def __init__(self, wav_file, target, filename):
-        self.wav_file = wav_file
-        self.target = target
-        self.filename = filename
-
-    def apply(self):
-        # TODO: Take as user param
-        cutOffFrequency = 4000.0
-
-        outname = os.path.join(os.path.join(
-            self.target, "lp_filtered_" + self.filename))
-        with contextlib.closing(wave.open(self.wav_file, 'rb')) as spf:
-            sampleRate = spf.getframerate()
-            ampWidth = spf.getsampwidth()
-            nChannels = spf.getnchannels()
-            nFrames = spf.getnframes()
-
-            # Extract Raw Audio from multi-channel Wav File
-            signal = spf.readframes(nFrames * nChannels)
-            spf.close()
-            channels = self.interpret_wav(
-                signal, nFrames, nChannels, ampWidth, True)
-
-            # get window size
-            # from http://dsp.stackexchange.com/questions/9966/what-is-the-cut-off-frequency-of-a-moving-average-filter
-            freqRatio = (cutOffFrequency / sampleRate)
-            N = int(math.sqrt(0.196196 + freqRatio ** 2) / freqRatio)
-
-            # Use moving average (only on first channel)
-            filtered = self.running_mean(channels[0], N).astype(channels.dtype)
-
-            wav_file = wave.open(outname, "w")
-            wav_file.setparams((1, ampWidth, sampleRate, nFrames,
-                                spf.getcomptype(), spf.getcompname()))
-            wav_file.writeframes(filtered.tobytes('C'))
-            wav_file.close()
-            return outname
-"""
-
 class EllipticFilter(Filter):
     def __init__(self, wav_file, target, filename):
         self.wav_file = wav_file
