@@ -1,7 +1,8 @@
 import React, { useEffect, useState, useContext } from 'react';
-import { Button } from 'react-bootstrap';
+import { Button, Card } from 'react-bootstrap';
 import { GenerateContext } from '../GenerateContext';
 import { getSampleInfo, getSample, getImage } from '../../api';
+import './SampleSelect.css'
 
 const SampleObj = props => {
    const [getGenState, setGenState] = useContext(GenerateContext);
@@ -21,45 +22,79 @@ const SampleObj = props => {
       });
    }, []);
 
-   const isSelected = () => getGenState('SAMPLE') == name;
-   const select = () => setGenState('SAMPLE', new File([blob], info.src, {type:'audio/wav'}));
+   const isSelected = () => getGenState('SAMPLE')['name'] === name;
+   const select = () =>
+      setGenState('SAMPLE', {
+         name: name,
+         file: new File([blob], info.src, {type:'audio/wav'})
+      });
 
    return (
-      <div>
-         <b>{name} by {artist}</b>
+      <Card className="sample">
+         <h3>{name} by {artist}</h3>
+         <div className="test">
          {isSelected() ?
          <Button disabled={true}>Selected</Button>
          :
          <Button onClick={select}>Select</Button>
          }
          <Button onClick={e => window.open(url, '_blank')}>Play</Button>
-         {imgStr ? <img src={imgStr}/> : ""}
-      </div>
+         {imgStr ? <img className="spectrogram" src={imgStr}/> : ""}
+         </div>
+         
+      </Card>
    )
 }
 
 const UploadObj = props => {
    const [getGenState, setGenState] = useContext(GenerateContext);
-   let uploadInput;
 
-   const select = e  => {
+   const [blob, setBlob] = useState({});
+   const [url, setURL] = useState("");
+   const [imgStr, setImgStr] = useState("");
+
+   let uploadInput;
+   let name = null;
+
+   const isSelected = () => getGenState('SAMPLE')['name'] === name;
+   const select = async e => {
       e.preventDefault();
-      setGenState('SAMPLE', uploadInput.files[0]);
-      console.log(`selected sample: ${getGenState('SAMPLE')}`);
+      const file = uploadInput.files[0];
+      
+      if (file) {
+         name = file.name;
+         setGenState('SAMPLE', {
+            name: name,
+            file: file
+         });
+
+         let fileToBlob = async (f) => new Blob([new Uint8Array(await f.arrayBuffer())], {type: f.type });
+         let b = await fileToBlob(file);
+         setBlob(b);
+         setURL(window.URL.createObjectURL(b));
+         getImage(b).then(base64 => setImgStr(base64));
+      }
    }
 
    return (
-      <div>
-            <b>Upload a .wav file</b>
-            <form onSubmit={select}>
-               <div>
-                  <input ref={ref => uploadInput = ref} type="file"/>
-               </div>
-               <div>
-                  <button>Select</button>
-               </div>
-            </form>
-         </div>
+      <Card className="sample">
+         <h3>Upload a .wav file</h3>
+         <form onSubmit={select}>
+            <div>
+               <input ref={ref => uploadInput = ref} type="file"/>
+            </div>
+            <div>
+               {isSelected() ?
+               <button disabled={true}>Selected</button>
+               :
+               <button>Select</button>
+               }
+               <Button onClick={e => window.open(url, '_blank')} disabled={url === ""}>Play</Button>
+               {imgStr ? <img className="spectrogram" src={imgStr}/> : ""}
+            </div>
+         </form>
+      </Card>
+
    );
 }
 
@@ -71,13 +106,13 @@ export default function SampleSelect(props) {
    }, [])
 
    return (
-      <section className='container'>
+      <Card className="sample-selector">
          <h2>Select a sample</h2>
          {sampleInfo && sampleInfo.length ?
          sampleInfo.map(info => <SampleObj info={info}/>)
          : ""
          }
          <UploadObj/>
-      </section>
+      </Card>
    );
 }

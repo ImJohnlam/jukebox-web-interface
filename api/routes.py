@@ -115,9 +115,14 @@ def get_sample_info():
     logger.info("hit sample info")
     return {'samples': [
         {
-            'name': 'Example Song',
-            'artist': 'Example Artist',
-            'src': 'example.wav'
+            'name': 'Pink Panther Example',
+            'artist': 'Hari',
+            'src': 'pink_panther.wav'
+        },
+        {
+            'name': 'Piano Example',
+            'artist': 'John',
+            'src': 'piano.wav'
         }
     ]}
 
